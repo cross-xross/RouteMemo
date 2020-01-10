@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import Modal from "react-native-modal";
 
 import DriveList, {DeviceListProps} from './components/DriveList';
+import PointNameDialog from './components/PointNameDialog';
 
 interface AppState {
   drives: Drive[];
@@ -33,12 +34,15 @@ class DriveImpl implements Drive {
  * ApplicationComponent
  */
 export default class App extends React.Component<{}, AppState> {
+  private myInput;
+
   /**
    * Constructor
    */
   constructor(props: {}) {
     super(props);
     this.state = this.initializeState();
+    this.myInput = React.createRef();
   }
 
   /**
@@ -59,10 +63,7 @@ export default class App extends React.Component<{}, AppState> {
           />
         </View>
         <Modal isVisible={this.state.isModalVisible}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#fff" }}>
-            <Text>Modal Content</Text>
-            <Button title="Close modal" onPress={this.toggleModal} />
-          </View>
+          <PointNameDialog ref={this.myInput} parent={this} />
         </Modal>
       </View>
     );
@@ -86,7 +87,7 @@ export default class App extends React.Component<{}, AppState> {
    * handle Record button touched.
    */
   handleRecordBtnClick = () => {
-    this.toggleModal;
+    this.toggleModal(true);
     // let updatedDrive;
     // let tmpDrives = [...this.state.drives]
     //                   .map((drive, index) => {
@@ -105,8 +106,9 @@ export default class App extends React.Component<{}, AppState> {
     // } as AppState)
   }
 
-  private toggleModal = () => {
-    this.setState(() => ({drives:this.state.drives, isModalVisible: true}));
+  toggleModal = (v: boolean) => {
+    this.setState({isModalVisible: v} as AppState);
+    console.log("pointName:" + this.myInput.current.pointName());
   }
 
   /**
@@ -123,9 +125,13 @@ export default class App extends React.Component<{}, AppState> {
           id: 2,
           pointName: '村営駐車場',
         },
+        {
+          id: 3,
+          pointName: '休憩所',
+        },
       ],
       isModalVisible: false
-    } as AppState    
+    } as AppState
   }
 
   private updateDriveInfo = (drive: Drive) => {

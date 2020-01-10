@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import Modal from "react-native-modal";
 
 import DriveList, {DeviceListProps} from './components/DriveList';
-import PointNameDialog from './components/PointNameDialog';
+import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
 
 interface AppState {
   drives: Drive[];
@@ -34,7 +34,6 @@ class DriveImpl implements Drive {
  * ApplicationComponent
  */
 export default class App extends React.Component<{}, AppState> {
-  private myInput;
 
   /**
    * Constructor
@@ -42,7 +41,6 @@ export default class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = this.initializeState();
-    this.myInput = React.createRef();
   }
 
   /**
@@ -63,7 +61,7 @@ export default class App extends React.Component<{}, AppState> {
           />
         </View>
         <Modal isVisible={this.state.isModalVisible}>
-          <PointNameDialog ref={this.myInput} parent={this} />
+          <PointNameDialog onDialogDismiss={this.handleDialogDismiss} />
         </Modal>
       </View>
     );
@@ -88,27 +86,10 @@ export default class App extends React.Component<{}, AppState> {
    */
   handleRecordBtnClick = () => {
     this.toggleModal(true);
-    // let updatedDrive;
-    // let tmpDrives = [...this.state.drives]
-    //                   .map((drive, index) => {
-    //                     if (index !== this.state.drives.length - 1) return drive;
-    //                     updatedDrive = this.updateDriveInfo(drive);
-    //                     return updatedDrive;
-    //                   });
-    // if (updatedDrive === null) {
-    //   // 最後の地点の出発時刻まで記録済なので、新しい地点オブジェクトを追加
-    //   const newDrive = new DriveImpl(this.state.drives.length);
-    //   newDrive.arrivalTime = (new Date()).toLocaleTimeString();
-    //   tmpDrives.push(newDrive);
-    // }
-    // this.setState({
-    //   drives: tmpDrives
-    // } as AppState)
   }
 
   toggleModal = (v: boolean) => {
     this.setState({isModalVisible: v} as AppState);
-    console.log("pointName:" + this.myInput.current.pointName());
   }
 
   /**
@@ -151,6 +132,14 @@ export default class App extends React.Component<{}, AppState> {
       return null;
     }
     return newDrive;   
+  }
+
+  /**
+   * handle modal dialog event.
+   */
+  handleDialogDismiss = (value: PointNameDialogState) => {
+    console.log(value);
+    this.toggleModal(false);
   }
 }
 

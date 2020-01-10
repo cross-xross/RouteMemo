@@ -5,10 +5,10 @@ import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 import App from '../App';
 
 export interface PointNameDialogProps {
-    parent: App;
+    onDialogDismiss: (PointNameDialogState?) => void;
 }
 
-interface PointNameDialogState {
+export interface PointNameDialogState {
     pointName: string;
     pointMemo: string;
 }
@@ -35,8 +35,8 @@ export default class PointNameDialog extends React.Component<PointNameDialogProp
                     <TextInput style={{ height: 100, borderColor: 'gray', borderWidth: 1, margin: 2 }} value={""} multiline></TextInput>
                 </View>
                 <View style={{flexDirection: 'row', justifyContent: 'flex-end', padding: 2}}>
-                    <Button title="OK" onPress={() => this.props.parent.toggleModal(false)} />
-                    <Button title="Cancel" onPress={() => this.props.parent.toggleModal(false)} />
+                    <Button title="OK" onPress={() => this.props.onDialogDismiss(this.state) } />
+                    <Button title="Cancel" onPress={() => this.props.onDialogDismiss()} />
                 </View>
           </View>
         );

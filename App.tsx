@@ -85,7 +85,58 @@ export default class App extends React.Component<{}, AppState> {
    * handle Record button touched.
    */
   handleRecordBtnClick = () => {
-    this.toggleModal(true);
+    let updatedDrive;
+    let addDrive = false;
+    let tmpDrives = [...this.state.drives]
+                      .map((drive, index) => {
+                        if (index !== this.state.drives.length - 1) return drive;
+                        updatedDrive = this.updateDriveInfo(drive);
+                        if (updatedDrive === null) {
+                          updatedDrive = {...drive};
+                          addDrive = true;
+                        }
+                        return updatedDrive;
+                      });
+    if (addDrive) {
+      // 最後の地点の出発時刻まで記録済なので、新しい地点オブジェクトを追加
+      const newDrive = new DriveImpl(this.state.drives.length);
+      newDrive.arrivalTime = (new Date()).toLocaleTimeString();
+      tmpDrives.push(newDrive);
+    }
+    this.setState({drives: tmpDrives} as AppState);
+  }
+
+  private updateDriveInfo = (drive: Drive) => {
+    const newDrive = {...drive};
+    if (drive.arrivalTime === undefined) {
+      // このコードを通ることはないはず
+      newDrive.arrivalTime = (new Date()).toLocaleTimeString();
+    } else if (drive.pointName === undefined) {
+      this.toggleModal(true);
+    } else if (drive.departureTime === undefined) {
+      newDrive.departureTime = (new Date()).toLocaleTimeString();
+    } else {
+      // 最後の地点の出発時刻まで記録済
+      return null;
+    }
+    return newDrive;
+  }
+
+  /**
+   * handle modal dialog event.
+   */
+  handleDialogDismiss = (value: PointNameDialogState) => {
+    if (value !== undefined) {
+      let tmpDrives = [...this.state.drives]
+      .map((drive, index) => {
+        if (index !== this.state.drives.length - 1) return drive;
+        const newDrive = {...drive};
+        newDrive.pointName = value.pointName;
+        return newDrive;
+      });
+      this.setState({drives: tmpDrives} as AppState)
+    }
+    this.toggleModal(false);
   }
 
   toggleModal = (v: boolean) => {
@@ -99,48 +150,28 @@ export default class App extends React.Component<{}, AppState> {
     return {
       drives: [
         {
-          id: 1,
+          id: 0,
+          arrivalTime: "",
           pointName: 'スタート地点',
+          departureTime: ""
+        },
+        {
+          id: 1,
+          arrivalTime: "",
+          pointName: '村営駐車場',
+          departureTime: ""
         },
         {
           id: 2,
-          pointName: '村営駐車場',
-        },
-        {
-          id: 3,
+          arrivalTime: "",
           pointName: '休憩所',
+          departureTime: ""
         },
       ],
       isModalVisible: false
     } as AppState
   }
 
-  private updateDriveInfo = (drive: Drive) => {
-    const newDrive = {...drive};
-    if (drive.arrivalTime === undefined) {
-      // このコードを通ることはないはず
-      newDrive.arrivalTime = (new Date()).toLocaleTimeString();
-    } else if (drive.pointName === undefined) {
-      newDrive.arrivalTime = drive.arrivalTime;
-      newDrive.pointName = "新しい地点名";
-    } else if (drive.departureTime === undefined) {
-      newDrive.arrivalTime = drive.arrivalTime;
-      newDrive.pointName = drive.pointName;
-      newDrive.departureTime = (new Date()).toLocaleTimeString();
-    } else {
-      // 最後の地点の出発時刻まで記録済
-      return null;
-    }
-    return newDrive;   
-  }
-
-  /**
-   * handle modal dialog event.
-   */
-  handleDialogDismiss = (value: PointNameDialogState) => {
-    console.log(value);
-    this.toggleModal(false);
-  }
 }
 
 /**

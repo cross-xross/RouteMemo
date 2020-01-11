@@ -25,16 +25,16 @@ export default class PointNameDialog extends React.Component<PointNameDialogProp
 
     render() {
         return (
-            <View style={{backgroundColor: "#fff" }}>
+            <View style={styles.container}>
                 <View>
                     <Text>地点名</Text>
-                    <TextInput style={{ height: 30, borderColor: 'gray', borderWidth: 1, margin: 2 }} value={""} onChangeText={(text) => {this.state = {pointName: text, pointMemo: ""}}}></TextInput>
+                    <TextInput style={styles.pointNameInput} onChangeText={(text) => {this.handleOnChangePointNameInput(text)}}></TextInput>
                 </View>
                 <View>
                     <Text>メモ</Text>
-                    <TextInput style={{ height: 100, borderColor: 'gray', borderWidth: 1, margin: 2 }} value={""} multiline></TextInput>
+                    <TextInput style={styles.pointMemoInput} multiline onChangeText={(text) => {this.handleOnChangePointMemoInput(text)}}></TextInput>
                 </View>
-                <View style={{flexDirection: 'row', justifyContent: 'flex-end', padding: 2}}>
+                <View style={styles.pointNameDialogButtons}>
                     <Button title="OK" onPress={() => this.props.onDialogDismiss(this.state) } />
                     <Button title="Cancel" onPress={() => this.props.onDialogDismiss()} />
                 </View>
@@ -42,7 +42,37 @@ export default class PointNameDialog extends React.Component<PointNameDialogProp
         );
     }
 
-    pointName = () => {
-        return this.state.pointName;
+    handleOnChangePointNameInput = (text) => {
+        this.setState({pointName: text});
+    }
+
+    handleOnChangePointMemoInput = (text) => {
+        this.setState({pointMemo: text});
     }
 }
+
+/**
+ * Define view styles.
+ */
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: "#fff"
+    },
+    pointNameInput: {
+        height: 30,
+        borderColor: 'gray',
+        borderWidth: 1,
+        margin: 2
+    },
+    pointMemoInput: {
+        height: 100,
+        borderColor: 'gray',
+        borderWidth: 1,
+        margin: 2
+    },
+    pointNameDialogButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        padding: 2
+    }
+});

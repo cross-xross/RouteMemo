@@ -2,8 +2,6 @@ import * as React from 'react';
 
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 
-import App from '../App';
-
 export interface PointNameDialogProps {
     onDialogDismiss: (PointNameDialogState?) => void;
 }

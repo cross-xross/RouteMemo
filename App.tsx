@@ -2,13 +2,16 @@ import * as React from 'react';
 import { View, Button, StyleSheet, FlatList } from 'react-native';
 import Modal from "react-native-modal";
 
-import {Drive} from './components/Drive';
+import {Drive} from './domains/Drive';
 import DriveList, {DeviceListProps} from './components/DriveList';
-import DriveListManager from './components/DriveListManager';
 import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
+import DriveHistory from './domains/DriveHistory';
 
+/**
+ * State定義
+ */
 interface AppState {
-  drives: Drive[];
+  drives: DriveHistory;
   isModalVisible: boolean;
 }
 
@@ -17,15 +20,13 @@ interface AppState {
  */
 export default class App extends React.Component<{}, AppState> {
 
-  drivesManager: DriveListManager = new DriveListManager(this);
-
   /**
    * Constructor
    */
   constructor(props: {}) {
     super(props);
     this.state = {
-      drives: this.drivesManager.drives,
+      drives: new DriveHistory(),
       isModalVisible: false
     } as AppState;
   }
@@ -37,7 +38,7 @@ export default class App extends React.Component<{}, AppState> {
     return (
       <View style={styles.container}>
         <FlatList
-          data={this.state.drives}
+          data={this.state.drives.getDriveList()}
           renderItem={value => this.renderList(value.item)}
           keyExtractor={value => `${value.id}`}
         />
@@ -47,9 +48,8 @@ export default class App extends React.Component<{}, AppState> {
             onPress={this.handleRecordBtnClick}
           />
         </View>
-        <Modal isVisible={this.state.isModalVisible}>
-          <PointNameDialog onDialogDismiss={this.handleDialogDismiss} />
-        </Modal>
+        <PointNameDialog isModalVisible={this.state.isModalVisible} 
+                         onDialogDismiss={this.handleDialogDismiss} />
       </View>
     );
   }
@@ -68,24 +68,29 @@ export default class App extends React.Component<{}, AppState> {
     );
   };
 
+  /**
+   * Recordボタン押下時の処理
+   */
   handleRecordBtnClick = () => {
-    this.drivesManager.addNewRecord();
+    this.state.drives.addNewRecord();
+    this.setState({
+      ...this.state,
+      isModalVisible: true
+    });
   }
 
   /**
-   * handle modal dialog event.
+   * モーダルダイアログで発生したイベントハンドリング
    */
   handleDialogDismiss = (value: PointNameDialogState) => {
     if (value !== undefined) {
-      this.drivesManager.addPointName(value.pointName);
+      this.state.drives.addPointName(value.pointName); 
     }
-    this.toggleModal(false);
+    this.setState({
+      ...this.state,
+      isModalVisible: false
+    });   
   }
-
-  toggleModal = (v: boolean) => {
-    this.setState({isModalVisible: v} as AppState);
-  }
-
 }
 
 /**

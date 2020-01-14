@@ -1,3 +1,2 @@
 image:
-  file: Dockerfile
-  context: docker
+  file: .gitpod.Dockerfile

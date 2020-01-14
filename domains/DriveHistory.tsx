@@ -1,4 +1,4 @@
-import {Drive, DriveImpl} from './Drive';
+import {Drive, DriveImpl, DriveCondition} from './Drive';
 
 /**
  * 運転履歴を保持するドメインクラスです
@@ -18,22 +18,23 @@ export default class DriveHistory {
    * ログを追加します
    */
   addNewRecord = () => {
-    let lastRecord: Drive;
-    this.drives = this.drives
-                      .map((drive, index) => {
-                        if (index !== this.drives.length - 1) return drive;
-                        drive.moveNextInput();
-                        lastRecord = drive;
-                        return lastRecord;
-                      });
-    if (lastRecord.isAllAreaInputed) {
-      const newDrive = new DriveImpl(this.drives.length);
-      newDrive.arrivalTime = (new Date()).toLocaleTimeString();
-      this.drives.push(newDrive);
+    if (this.getLatestDrive().isAllAreaInputed()) {
+      this.drives.push(new DriveImpl(this.drives.length, 
+        undefined, 
+       (new Date()).toLocaleTimeString(), 
+        undefined,
+        DriveCondition.WAIT_FOR_POINT_NAME));
+    } else {
+      this.drives = this.drives
+        .map((drive, index) => {
+          if (index !== this.drives.length - 1) return drive;
+          drive.moveNextInput();
+          return drive;
+        });
     }
   }
 
-  /**
+  /*
    * 地点名を追加します
    * @param newPointName 
    */
@@ -51,6 +52,13 @@ export default class DriveHistory {
    */
   getDriveList() : Drive[] {
       return this.drives;
+  }
+
+  /**
+   * 一番新しい運転履歴を取得します
+   */
+  getLatestDrive() : Drive {
+    return this.drives[this.drives.length - 1];
   }
   
   /**

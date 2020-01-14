@@ -1,27 +1,37 @@
+export enum DriveCondition {
+  WAIT_FOR_ARRIVAL,
+  WAIT_FOR_POINT_NAME,
+}
+
 export interface Drive {
   id: number;
   pointName?: string;
   arrivalTime?: string;
   departureTime?: string;
+  mode: DriveCondition;
 
   isAllAreaInputed(): boolean;
   moveNextInput(): void;
 }
+
+
 
 export class DriveImpl implements Drive {
   id: number;
   pointName?: string;
   arrivalTime?: string;
   departureTime?: string;
+  mode: DriveCondition;
 
   /**
    * コンストラクタ
    */
-  constructor(id: number, pointName?: string, arrivalTime?: string, departureTime?: string) {
+  constructor(id: number, pointName?: string, arrivalTime?: string, departureTime?: string, mode?: DriveCondition) {
     this.id = id;
     this.pointName = pointName;
     this.arrivalTime = arrivalTime;
     this.departureTime = departureTime;
+    this.mode = mode;
   }
 
   /**
@@ -41,10 +51,10 @@ export class DriveImpl implements Drive {
       // このコードを通ることはないはず
       this.arrivalTime = (new Date()).toLocaleTimeString();
     } else if (this.pointName === undefined) {
-      console.log("pointName undefined.");
-      console.log("dialog visible.");
+      
     } else if (this.departureTime === undefined) {
       this.departureTime = (new Date()).toLocaleTimeString();
+      this.mode = DriveCondition.WAIT_FOR_ARRIVAL;
     }
   }
 }

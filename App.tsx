@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { View, Button, StyleSheet, FlatList } from 'react-native';
-import Modal from "react-native-modal";
 
-import {Drive} from './domains/Drive';
+import {Drive, DriveCondition} from './domains/Drive';
 import DriveList, {DeviceListProps} from './components/DriveList';
 import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
 import DriveHistory from './domains/DriveHistory';
@@ -73,9 +72,10 @@ export default class App extends React.Component<{}, AppState> {
    */
   handleRecordBtnClick = () => {
     this.state.drives.addNewRecord();
+    const latestDrive = this.state.drives.getLatestDrive();
     this.setState({
       ...this.state,
-      isModalVisible: true
+      isModalVisible: latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME
     });
   }
 

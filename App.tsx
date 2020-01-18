@@ -1,44 +1,35 @@
 import * as React from 'react';
-import { Text, View, Button, StyleSheet, FlatList, Alert } from 'react-native';
-import Constants from 'expo-constants';
+import { View, Button, StyleSheet, FlatList } from 'react-native';
 
+import {Drive, DriveCondition} from './domains/Drive';
 import DriveList, {DeviceListProps} from './components/DriveList';
+import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
+import DriveHistory from './domains/DriveHistory';
 
+/**
+ * State定義
+ */
 interface AppState {
-  drives: Drive[]
+  drives: DriveHistory;
+  isModalVisible: boolean;
 }
-
-interface Drive {
-  id: number;
-  pointName?: string;
-  arrivalTime?: string;
-  departureTime?: string;
-}
-
-class DriveImpl implements Drive {
-  id: number;
-  pointName?: string;
-  arrivalTime?: string;
-  departureTime?: string;
-
-  constructor(id: number) {
-    this.id = id;
-  }
-}
-
 
 /**
  * ApplicationComponent
  */
 export default class App extends React.Component<{}, AppState> {
+
   /**
    * Constructor
    */
   constructor(props: {}) {
     super(props);
-    this.state = this.initializeState();
+    this.state = {
+      drives: new DriveHistory(),
+      isModalVisible: false
+    } as AppState;
   }
-
+ 
   /**
    * render main view.
    */
@@ -46,7 +37,7 @@ export default class App extends React.Component<{}, AppState> {
     return (
       <View style={styles.container}>
         <FlatList
-          data={this.state.drives}
+          data={this.state.drives.getDriveList()}
           renderItem={value => this.renderList(value.item)}
           keyExtractor={value => `${value.id}`}
         />
@@ -56,6 +47,8 @@ export default class App extends React.Component<{}, AppState> {
             onPress={this.handleRecordBtnClick}
           />
         </View>
+        <PointNameDialog isModalVisible={this.state.isModalVisible} 
+                         onDialogDismiss={this.handleDialogDismiss} />
       </View>
     );
   }
@@ -75,62 +68,28 @@ export default class App extends React.Component<{}, AppState> {
   };
 
   /**
-   * handle Record button touched.
+   * Recordボタン押下時の処理
    */
   handleRecordBtnClick = () => {
-    let updatedDrive;
-    let tmpDrives = [...this.state.drives]
-                      .map((drive, index) => {
-                        if (index !== this.state.drives.length - 1) return drive;
-                        updatedDrive = this.updateDriveInfo(drive);
-                        return updatedDrive;
-                      });
-    if (updatedDrive === null) {
-      // 最後の地点の出発時刻まで記録済なので、新しい地点オブジェクトを追加
-      const newDrive = new DriveImpl(this.state.drives.length);
-      newDrive.arrivalTime = (new Date()).toLocaleTimeString();
-      tmpDrives.push(newDrive);
-    }
+    this.state.drives.addNewRecord();
+    const latestDrive = this.state.drives.getLatestDrive();
     this.setState({
-      drives: tmpDrives
-    } as AppState)
+      ...this.state,
+      isModalVisible: latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME
+    });
   }
 
   /**
-   * initialize state value;
+   * モーダルダイアログで発生したイベントハンドリング
    */
-  private initializeState = () => {
-    return {
-      drives: [
-        {
-          id: 1,
-          pointName: 'スタート地点',
-        },
-        {
-          id: 2,
-          pointName: '村営駐車場',
-        },
-      ]
-    } as AppState    
-  }
-
-  private updateDriveInfo = (drive: Drive) => {
-    const newDrive = {...drive};
-    if (drive.arrivalTime === undefined) {
-      // このコードを通ることはないはず
-      newDrive.arrivalTime = (new Date()).toLocaleTimeString();
-    } else if (drive.pointName === undefined) {
-      newDrive.arrivalTime = drive.arrivalTime;
-      newDrive.pointName = "新しい地点名";
-    } else if (drive.departureTime === undefined) {
-      newDrive.arrivalTime = drive.arrivalTime;
-      newDrive.pointName = drive.pointName;
-      newDrive.departureTime = (new Date()).toLocaleTimeString();
-    } else {
-      // 最後の地点の出発時刻まで記録済
-      return null;
+  handleDialogDismiss = (value: PointNameDialogState) => {
+    if (value !== undefined) {
+      this.state.drives.addPointName(value.pointName); 
     }
-    return newDrive;   
+    this.setState({
+      ...this.state,
+      isModalVisible: false
+    });   
   }
 }
 

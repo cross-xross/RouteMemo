@@ -38,19 +38,16 @@ export default class DriveHistory {
     }
   };
 
-  load = () => {
-    storage
-      .load({ key: 'drives' })
-      .then(res => {
-        const newDrives = [];
-        res.map(drive => {
-          const newDrive = new DriveImpl(0, '', '', '');
-          newDrive.load(drive);
-          newDrives.push(newDrive);
-        });
-        this.drives = newDrives;
-      })
-      .catch(err => console.warn('err:' + err));
+  load = async () => {
+    try {
+      const result: Drive[] = await storage.load({ key: 'drives' })
+      const drives: Drive[] = result.map(drive => {
+        return new DriveImpl(drive.id, drive.pointName, drive.arrivalTime, drive.departureTime);
+      });
+      this.drives = drives;
+    } catch (error) {
+      console.warn('err:' + error);
+    }
   };
 
   /**
@@ -107,9 +104,9 @@ export default class DriveHistory {
    */
   private initializeDrives = () => {
     return [
-      new DriveImpl(0, 'スタート地点', '', ''),
-      new DriveImpl(1, '村営駐車場', '', ''),
-      new DriveImpl(2, '休憩所', '', '')
+      //new DriveImpl(0, 'スタート地点', '', ''),
+      //new DriveImpl(1, '村営駐車場', '', ''),
+      //new DriveImpl(2, '休憩所', '', '')
     ];
   };
 }

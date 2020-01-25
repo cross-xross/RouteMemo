@@ -117,14 +117,17 @@ export default class App extends React.Component<{}, MyAppState> {
     this.state.drives.save();
   };
 
-  getData = () => {
-    const dHistory = new DriveHistory(null);
-    dHistory.load();
-    this.setState({
-      drives: dHistory,
-      isModalVisible: false,
-      appState: AppState.currentState
-    });
+  getData = async () => {
+    try {
+      await this.state.drives.load();
+      this.setState({
+        drives: this.state.drives,
+        isModalVisible: false,
+        appState: AppState.currentState
+      });
+    } catch(error) {
+      //
+    }
   };
 }
 

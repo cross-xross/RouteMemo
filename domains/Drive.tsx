@@ -38,13 +38,13 @@ export class DriveImpl implements Drive {
     this.mode = mode;
   }
 
-  load = newDrive => {
-    this.id = newDrive.id;
-    this.pointName = newDrive.pointName;
-    this.arrivalTime = newDrive.arrivalTime;
-    this.departureTime = newDrive.departureTime;
-    this.mode = newDrive.mode;
-  };
+  // load = newDrive => {
+  //   this.id = newDrive.id;
+  //   this.pointName = newDrive.pointName;
+  //   this.arrivalTime = newDrive.arrivalTime;
+  //   this.departureTime = newDrive.departureTime;
+  //   this.mode = newDrive.mode;
+  // };
 
   /**
    * 入力完了かどうかを取得します

@@ -40,9 +40,15 @@ export default class DriveHistory {
 
   load = async () => {
     try {
-      const result: Drive[] = await storage.load({ key: 'drives' })
+      const result: Drive[] = await storage.load({ key: 'drives' });
       const drives: Drive[] = result.map(drive => {
-        return new DriveImpl(drive.id, drive.pointName, drive.arrivalTime, drive.departureTime);
+        return new DriveImpl(
+          drive.id,
+          drive.pointName,
+          drive.arrivalTime,
+          drive.departureTime,
+          DriveCondition.WAIT_FOR_POINT_NAME
+        );
       });
       this.drives = drives;
     } catch (error) {
@@ -54,7 +60,7 @@ export default class DriveHistory {
    * ログを追加します
    */
   addNewRecord = () => {
-    if (this.getLatestDrive().isAllAreaInputed()) {
+    if (this.drives.length === 0 || this.getLatestDrive().isAllAreaInputed()) {
       this.drives.push(
         new DriveImpl(
           this.drives.length,
@@ -104,9 +110,9 @@ export default class DriveHistory {
    */
   private initializeDrives = () => {
     return [
-      //new DriveImpl(0, 'スタート地点', '', ''),
-      //new DriveImpl(1, '村営駐車場', '', ''),
-      //new DriveImpl(2, '休憩所', '', '')
+      // new DriveImpl(0, 'スタート地点', '', ''),
+      // new DriveImpl(1, '村営駐車場', '', ''),
+      // new DriveImpl(2, '休憩所', '', '')
     ];
   };
 }

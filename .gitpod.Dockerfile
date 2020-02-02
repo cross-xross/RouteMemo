@@ -32,3 +32,5 @@ ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN npm install expo-cli --global
 RUN npm install react-native-modal
 RUN npm install react-native-storage
+RUN npm install react-navigation
+RUN npm install react-navigation-stack

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Text, View, Button, StyleSheet, FlatList, AppState } from 'react-native';
-import { Drive, DriveCondition } from './domains/Drive';
+import { Text, View, Button, StyleSheet, FlatList } from 'react-native';
+import { Drive } from './domains/Drive';
 import DriveList, { DeviceListProps } from './components/DriveList';
 import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
 import { connect } from 'react-redux';
@@ -128,17 +128,6 @@ export class RouteEntry extends React.Component {
     } catch (error) {
       console.warn('err:' + error)
     }
-
-    // try {
-    //   await this.state.drives.load();
-    //   this.setState({
-    //     drives: this.state.drives,
-    //     isModalVisible: false,
-    //     appState: AppState.currentState
-    //   });
-    // } catch (error) {
-    //   //
-    // }
   };
 }
 
@@ -150,7 +139,6 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
-
 
 
 const mapStateToProps = state => ({

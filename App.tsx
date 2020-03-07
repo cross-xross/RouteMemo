@@ -5,26 +5,6 @@ import { RouteEntry, RouteHistory } from './RouteEntry'
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 
-// const AppNavigator = createStackNavigator({
-//   Preload: {
-//     screen: RouteEntry,
-//   },
-// });
-
-
-// const AppContainer = createAppContainer(AppNavigator);
-
-// export default class App extends Component {
-//   render() {
-//     return (
-//       <Provider store={store}>
-//         <AppContainer />
-//       </Provider>
-//     )
-//   }
-// }
-
-
 const RootStack = createStackNavigator(
   {
     Entry: RouteEntry,

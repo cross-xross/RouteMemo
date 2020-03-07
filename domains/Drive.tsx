@@ -10,8 +10,8 @@ export interface Drive {
   departureTime?: string;
   mode: DriveCondition;
 
-  isAllAreaInputed(): boolean;
-  moveNextInput(): void;
+  // isAllAreaInputed(): boolean;
+  // moveNextInput(): void;
 }
 
 export class DriveImpl implements Drive {
@@ -49,25 +49,25 @@ export class DriveImpl implements Drive {
   /**
    * 入力完了かどうかを取得します
    */
-  isAllAreaInputed(): boolean {
-    if (
-      this.arrivalTime !== undefined &&
-      this.pointName !== undefined &&
-      this.departureTime !== undefined
-    ) {
-      return true;
-    }
-    return false;
-  }
+  // isAllAreaInputed(): boolean {
+  //   if (
+  //     this.arrivalTime !== undefined &&
+  //     this.pointName !== undefined &&
+  //     this.departureTime !== undefined
+  //   ) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
-  moveNextInput() {
-    if (this.arrivalTime === undefined) {
-      // このコードを通ることはないはず
-      this.arrivalTime = new Date().toLocaleTimeString();
-    } else if (this.pointName === undefined) {
-    } else if (this.departureTime === undefined) {
-      this.departureTime = new Date().toLocaleTimeString();
-      this.mode = DriveCondition.WAIT_FOR_ARRIVAL;
-    }
-  }
+  // moveNextInput() {
+  //   if (this.arrivalTime === undefined) {
+  //     // このコードを通ることはないはず
+  //     this.arrivalTime = new Date().toLocaleTimeString();
+  //   } else if (this.pointName === undefined) {
+  //   } else if (this.departureTime === undefined) {
+  //     this.departureTime = new Date().toLocaleTimeString();
+  //     this.mode = DriveCondition.WAIT_FOR_ARRIVAL;
+  //   }
+  // }
 }

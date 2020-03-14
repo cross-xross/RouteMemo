@@ -1,50 +1,19 @@
 import * as React from 'react';
 import { Text, View, Button, StyleSheet, FlatList } from 'react-native';
-import { Drive } from './domains/Drive';
-import DriveList, { DeviceListProps } from './components/DriveList';
-import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
+import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { Drive } from './domains/Drive';
+import DriveList from './components/DriveList';
+import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
 import { addNewRecord, addPointName, loadDrives } from './Reducer'
 import AppStorage from './AppStorage'
 
 const appStorage = new AppStorage()
 
 /**
- * State定義
- */
-// interface MyAppState {
-//   drives: Drive[];
-//   isModalVisible: boolean;
-//   appState: string;
-// }
-
-
-export class RouteHistory extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text>Route History</Text>
-      </View>
-    );
-  }
-}
-
-/**
  * ApplicationComponent
  */
-export class RouteEntry extends React.Component {
-  /**
-   * Constructor
-   */
-  // constructor(props: {}) {
-  //   super(props);
-  //   this.state = {
-  //     drives: [],
-  //     isModalVisible: false,
-  //     appState: AppState.currentState
-  //   } as MyAppState;
-  // }
-
+export class RouteEntry extends React.Component<RouteEntryProps> {
   /**
    * render main view.
    */
@@ -148,14 +117,17 @@ const mapStateToProps = state => ({
   isModalVisible: state.user.isModalVisible
 })
 
-const mapDispatchToProps = {
-  // importしたactionCreatorを記述。
-  addNewRecord,
-  addPointName,
-  loadDrives
-}
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  addNewRecord: () => dispatch(addNewRecord()),
+  addPointName: (newPointName: string) => dispatch(addPointName(newPointName)),
+  loadDrives: (drives: Drive[]) => dispatch(loadDrives(drives))
+})
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(RouteEntry)
+
+type StateProps = ReturnType<typeof mapStateToProps>
+type DispatchProps = ReturnType<typeof mapDispatchToProps>
+type RouteEntryProps = StateProps & DispatchProps

@@ -39,7 +39,9 @@ export const renameRoute = (routeId: number, newRouteName: string) => ({
     newRouteName: newRouteName
 })
 
-
+/**
+ * 新規ルート生成
+ */
 const createNewRoute = (): Route => {
     const now = new Date()
     const newCurrentRoute = new RouteImpl(
@@ -49,6 +51,9 @@ const createNewRoute = (): Route => {
     return newCurrentRoute
 }
 
+/**
+ * stateの初期値
+ */
 const initState = () => {
     const newCurrentRoute = createNewRoute()
     const newRoutes = []
@@ -67,6 +72,7 @@ const initState = () => {
 // reducerはactionで生成されたオブジェクトを受け取り、巨大なjson(store)を書き換える関数です。
 const reducer = (state = initState(), action) => {
     switch (action.type) {
+        // ドライブレコード追加
         case 'ADD_NEW_RECORD': {
             const newDrives = addNewRecordImpl(state.currentRoute.drives)
             const latestDrive = getLatestDrive(newDrives)
@@ -80,6 +86,7 @@ const reducer = (state = initState(), action) => {
                 isModalVisible: latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME
             }
         }
+        // 地点名追加
         case 'ADD_POINT_NAME': {
             const newDrives = state.currentRoute.drives.map((drive, index) => {
                 if (index !== state.currentRoute.drives.length - 1) return drive;
@@ -96,6 +103,7 @@ const reducer = (state = initState(), action) => {
                 isModalVisible: false
             }
         }
+        // ルート新規生成
         case 'CREATE_ROUTE': {
             // currentRouteをallRoutesに保存する
             let issaved = false
@@ -116,6 +124,7 @@ const reducer = (state = initState(), action) => {
                 currentRouteId: newCurrentRoute.id
             }
         }
+        // ルートをstateに保存
         case 'LOAD_ALL_ROUTES': {
             const newRoutes = [...action.routes]
             let newCurrentRouteId = action.currentRouteId
@@ -134,14 +143,15 @@ const reducer = (state = initState(), action) => {
                 currentRouteId: newCurrentRouteId
             }
         }
+        // Actionで渡されたルートをstateのcurrentRouteに保存
         case 'LOAD_ROUTE': {
             // currentRouteをallRoutesに保存する
-            // Actionで渡されたRouteをcurrentRouteとcurrentRouteIdに設定する
             const newRoutes = state.allRoutes.map(value => {
                 if (value.id !== state.currentRouteId) return value
                 return state.currentRoute
             })
 
+            // Actionで渡されたRouteをcurrentRouteとcurrentRouteIdに設定する
             if (action.route.id !== state.currentRouteId) {
                 const newRoute = { ...action.route }
                 return {
@@ -157,8 +167,8 @@ const reducer = (state = initState(), action) => {
                 }
             }
         }
+        // currentRouteをallRoutesに保存、まだ使ってない、不要かも
         case 'SAVE_ROUTE': {
-            // currentRouteをallRoutesに保存する、まだ使ってない
             const newRoutes = state.allRoutes.map(value => {
                 if (value.id !== state.currentRouteId) return value
                 return state.currentRoute
@@ -168,6 +178,7 @@ const reducer = (state = initState(), action) => {
                 allRoutes: newRoutes
             }
         }
+        // ルート名変更
         case 'RENAME_ROUTE': {
             const newRoutes = renameRouteImpl(state.allRoutes, action.routeId, action.newRouteName)
             if (state.currentRouteId !== action.routeId) {
@@ -214,7 +225,7 @@ const addNewRecordImpl = (drives: Drive[]): Drive[] => {
             new DriveImpl(
                 drives.length,
                 undefined,
-                new Date().toLocaleTimeString(),
+                Date.now(),
                 undefined,
                 DriveCondition.WAIT_FOR_POINT_NAME
             )
@@ -232,10 +243,10 @@ const moveNextInput = (drive: Drive): Drive => {
     const newDrive = { ...drive }
     if (newDrive.arrivalTime === undefined) {
         // このコードを通ることはないはず
-        newDrive.arrivalTime = new Date().toLocaleTimeString()
+        newDrive.arrivalTime = Date.now()
     } else if (newDrive.pointName === undefined) {
     } else if (newDrive.departureTime === undefined) {
-        newDrive.departureTime = new Date().toLocaleTimeString()
+        newDrive.departureTime = Date.now()
         newDrive.mode = DriveCondition.WAIT_FOR_ARRIVAL
     }
     return newDrive

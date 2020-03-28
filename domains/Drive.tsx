@@ -6,16 +6,16 @@ export enum DriveCondition {
 export interface Drive {
   id: number;
   pointName?: string;
-  arrivalTime?: string;
-  departureTime?: string;
+  arrivalTime?: number;
+  departureTime?: number;
   mode: DriveCondition;
 }
 
 export class DriveImpl implements Drive {
   id: number;
   pointName?: string;
-  arrivalTime?: string;
-  departureTime?: string;
+  arrivalTime?: number;
+  departureTime?: number;
   mode: DriveCondition;
 
   /**
@@ -24,8 +24,8 @@ export class DriveImpl implements Drive {
   constructor(
     id: number,
     pointName?: string,
-    arrivalTime?: string,
-    departureTime?: string,
+    arrivalTime?: number,
+    departureTime?: number,
     mode?: DriveCondition
   ) {
     this.id = id;

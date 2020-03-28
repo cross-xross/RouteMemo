@@ -1,11 +1,11 @@
 import * as React from 'react';
-
 import { Text, View, StyleSheet } from 'react-native';
+import { dateFormat } from '../util/dateFormat'
 
 export interface DeviceListProps {
   pointName: string;
-  arrivalTime: string;
-  departureTime: string;
+  arrivalTime: number;
+  departureTime: number;
 }
 
 export default class DriveList extends React.Component<DeviceListProps, {}> {
@@ -24,12 +24,12 @@ export default class DriveList extends React.Component<DeviceListProps, {}> {
             <View style={styles.verticalLine}>
               <View style={styles.circle} />
             </View>
-            <Text>{ this.props.pointName != undefined && this.props.pointName}</Text>
+            <Text>{this.props.pointName != undefined && this.props.pointName}</Text>
           </View>
 
           <View style={styles.right}>
-            <Text style={styles.time}>{this.props.arrivalTime != undefined && this.props.arrivalTime}着</Text>
-            <Text style={styles.time}>{this.props.departureTime != undefined && this.props.departureTime}発</Text>
+            <Text style={styles.time}>{this.dateToString(this.props.arrivalTime)}着</Text>
+            <Text style={styles.time}>{this.dateToString(this.props.departureTime)}発</Text>
           </View>
         </View>
 
@@ -40,7 +40,12 @@ export default class DriveList extends React.Component<DeviceListProps, {}> {
       </View>
     );
   }
+
+  dateToString = (date: number) => {
+    return ((typeof date === "undefined") ? "" : dateFormat.format(new Date(date), 'hh:mm'))
+  }
 }
+
 
 const styles = StyleSheet.create({
   row: {

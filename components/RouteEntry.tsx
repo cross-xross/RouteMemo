@@ -94,10 +94,17 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
     console.log('currentRouteId:' + JSON.stringify(this.props.currentRouteId))
   }
 
+  /**
+   * 現在入力中のルートだけをストレージに保存する
+   * アプリが非表示になったときとかに呼ばれる想定だけど未実装
+   */
   storeData = () => {
     appStorage.saveCurrentRoute(this.props.currentRoute.drives)
   }
 
+  /**
+   * 全ルートのデータをストレージに保存
+   */
   store = () => {
     const newRoutes = this.props.allRoutes.map(value => {
       if (value.id !== this.props.currentRouteId) return value
@@ -108,6 +115,9 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
     appStorage.saveAllRoutes(newRoutes, this.props.currentRouteId)
   }
 
+  /**
+   * ストレージに保存されている全ルートをstoreにロード
+   */
   restore = async () => {
     try {
       const routesAndCurrent = await appStorage.loadAllRoutes()
@@ -126,7 +136,6 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
-
 
 const mapStateToProps = state => ({
   // storeは巨大なJsonの塊なので、nameにjsonから取って来たデータを代入している。 

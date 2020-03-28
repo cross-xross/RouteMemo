@@ -1,4 +1,5 @@
 import { Drive } from './domains/Drive';
+import { Route } from './domains/Route';
 import Storage from 'react-native-storage';
 import { AsyncStorage } from 'react-native';
 
@@ -8,28 +9,69 @@ const storage = new Storage({
   defaultExpires: 1000 * 3600 * 24,
   enableCache: true,
   sync: {}
-});
+})
 
 export default class AppStorage {
 
-  saveDrivesToStorage = (drives: Drive[]) => {
+  saveCurrentRoute = (drives: Drive[]) => {
     try {
       storage.save({
-        key: 'drives',
+        key: 'currentDrives',
         data: drives
-      });
+      })
     } catch (error) {
       // Error saving data
     }
-  };
+  }
 
-  loadDrivesFromStorage = async (): Drive[] => {
+  saveAllRoutes = (routes: Route[], currentRouteId: number) => {
     try {
-      const result: Drive[] = await storage.load({ key: 'drives' })
-      return result
+      storage.save({
+        key: 'allRoutes',
+        data: routes
+      })
+      storage.save({
+        key: 'currentRouteId',
+        data: currentRouteId
+      })
     } catch (error) {
+      // Error saving data
       console.warn('err:' + error)
-      return []
     }
-  };
+  }
+
+  loadAllRoutes = async () => {
+    let allRoutes: Route[]
+    let currentRouteId: number
+    try {
+      allRoutes = await storage.load({ key: 'allRoutes' })
+    } catch (error) {
+      switch (error.name) {
+        case 'NotFoundError':
+          break
+        default:
+          console.warn('err:' + error)
+          break
+      }
+      allRoutes = []
+    }
+
+    try {
+      currentRouteId = await storage.load({ key: 'currentRouteId' })
+    } catch (error) {
+      switch (error.name) {
+        case 'NotFoundError':
+          break
+        default:
+          console.warn('err:' + error)
+          break
+      }
+      currentRouteId = -1
+    }
+
+    return {
+      allRoutes: allRoutes,
+      currentRouteId: currentRouteId
+    }
+  }
 }

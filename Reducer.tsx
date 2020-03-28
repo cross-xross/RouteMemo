@@ -1,5 +1,7 @@
 import { combineReducers, createStore } from 'redux';
 import { Drive, DriveImpl, DriveCondition } from './domains/Drive';
+import { Route, RouteImpl } from './domains/Route';
+import { dateFormat } from './util/dateFormat'
 
 // actions.js
 // actionはreduxの機能でなく、オブジェクトを作るための純粋なjsの関数です。
@@ -12,52 +14,193 @@ export const addPointName = (newPointName: string) => ({
     pointName: newPointName
 })
 
-export const loadDrives = (drives: Drive[]) => ({
-    type: 'LOAD_DRIVES',
-    drives: drives
+export const loadAllRoutes = (routes: Route[], currentRouteId: number) => ({
+    type: 'LOAD_ALL_ROUTES',
+    routes: routes,
+    currentRouteId: currentRouteId
 })
 
-const INITIAL_STATE = {
-    isModalVisible: false,
-    drives: []
+export const loadRoute = (route: Route) => ({
+    type: 'LOAD_ROUTE',
+    route: route
+})
+
+export const saveRoute = () => ({
+    type: 'SAVE_ROUTE'
+})
+
+export const createRoute = () => ({
+    type: 'CREATE_ROUTE'
+})
+
+export const renameRoute = (routeId: number, newRouteName: string) => ({
+    type: 'RENAME_ROUTE',
+    routeId: routeId,
+    newRouteName: newRouteName
+})
+
+
+const createNewRoute = (): Route => {
+    const now = new Date()
+    const newCurrentRoute = new RouteImpl(
+        now.getTime(),
+        dateFormat.format(now, 'yyyy/MM/dd hh:mm') + 'のルート'
+    )
+    return newCurrentRoute
+}
+
+const initState = () => {
+    const newCurrentRoute = createNewRoute()
+    const newRoutes = []
+    newRoutes.push(newCurrentRoute)
+    return {
+        isModalVisible: false,
+        allRoutes: newRoutes,
+        currentRoute: newCurrentRoute,
+        currentRouteId: newCurrentRoute.id
+    }
 }
 
 // reducers.js
 // reduxではglobal stateを巨大なjson(store)として管理します。stateの変更はjsonの書き換えによってのみ管理します。
 // actionは純粋なjsのオブジェクトを作る関数であることを思い出してください。
 // reducerはactionで生成されたオブジェクトを受け取り、巨大なjson(store)を書き換える関数です。
-const reducer = (state = INITIAL_STATE, action) => {
+const reducer = (state = initState(), action) => {
     switch (action.type) {
         case 'ADD_NEW_RECORD': {
-            const newDrives = addNewRecordImpl(state.drives)
+            const newDrives = addNewRecordImpl(state.currentRoute.drives)
             const latestDrive = getLatestDrive(newDrives)
+            const newCurretRoute = {
+                ...state.currentRoute,
+                drives: newDrives
+            }
             return {
                 ...state,
-                drives: newDrives,
+                currentRoute: newCurretRoute,
                 isModalVisible: latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME
             }
         }
         case 'ADD_POINT_NAME': {
-            const newDrives = state.drives.map((drive, index) => {
-                if (index !== state.drives.length - 1) return drive;
+            const newDrives = state.currentRoute.drives.map((drive, index) => {
+                if (index !== state.currentRoute.drives.length - 1) return drive;
                 drive.pointName = action.pointName
                 return drive;
             })
+            const newCurretRoute = {
+                ...state.currentRoute,
+                drives: newDrives
+            }
             return {
                 ...state,
-                drives: newDrives,
+                currentRoute: newCurretRoute,
                 isModalVisible: false
             }
         }
-        case 'LOAD_DRIVES': {
+        case 'CREATE_ROUTE': {
+            // currentRouteをallRoutesに保存する
+            let issaved = false
+            const newRoutes = state.allRoutes.map(value => {
+                if (value.id !== state.currentRouteId) return value
+                issaved = true
+                return state.currentRoute
+            })
+            if (!issaved) newRoutes.push(state.currentRoute)
+
+            // currentRouteに新しいRouteを設定する
+            const newCurrentRoute = createNewRoute()
+            newRoutes.push(newCurrentRoute)
             return {
                 ...state,
-                drives: [...action.drives]
+                allRoutes: newRoutes,
+                currentRoute: newCurrentRoute,
+                currentRouteId: newCurrentRoute.id
+            }
+        }
+        case 'LOAD_ALL_ROUTES': {
+            const newRoutes = [...action.routes]
+            let newCurrentRouteId = action.currentRouteId
+            // 現在のルートを読み込み
+            let newCurrentRoute = action.routes.find((value) => value.id === newCurrentRouteId)
+            if (typeof newCurrentRoute === "undefined") {
+                // 現在のルートを新規生成
+                newCurrentRoute = createNewRoute()
+                newCurrentRouteId = newCurrentRoute.id
+                newRoutes.push(newCurrentRoute)
+            }
+            return {
+                ...state,
+                allRoutes: newRoutes,
+                currentRoute: newCurrentRoute,
+                currentRouteId: newCurrentRouteId
+            }
+        }
+        case 'LOAD_ROUTE': {
+            // currentRouteをallRoutesに保存する
+            // Actionで渡されたRouteをcurrentRouteとcurrentRouteIdに設定する
+            const newRoutes = state.allRoutes.map(value => {
+                if (value.id !== state.currentRouteId) return value
+                return state.currentRoute
+            })
+
+            if (action.route.id !== state.currentRouteId) {
+                const newRoute = { ...action.route }
+                return {
+                    ...state,
+                    allRoutes: newRoutes,
+                    currentRoute: newRoute,
+                    currentRouteId: newRoute.id
+                }
+            } else {
+                return {
+                    ...state,
+                    allRoutes: newRoutes
+                }
+            }
+        }
+        case 'SAVE_ROUTE': {
+            // currentRouteをallRoutesに保存する、まだ使ってない
+            const newRoutes = state.allRoutes.map(value => {
+                if (value.id !== state.currentRouteId) return value
+                return state.currentRoute
+            })
+            return {
+                ...state,
+                allRoutes: newRoutes
+            }
+        }
+        case 'RENAME_ROUTE': {
+            const newRoutes = renameRouteImpl(state.allRoutes, action.routeId, action.newRouteName)
+            if (state.currentRouteId !== action.routeId) {
+                return {
+                    ...state,
+                    allRoutes: newRoutes
+                }
+            } else {
+                const newCurrentRoute = { ...state.currentRoute }
+                newCurrentRoute.routeName = action.newRouteName
+                return {
+                    ...state,
+                    allRoutes: newRoutes,
+                    currentRoute: newCurrentRoute
+                }
             }
         }
         default:
             return state;
     }
+}
+
+/**
+ * ルート名を変更します
+ */
+const renameRouteImpl = (routes: Route[], routeId: number, newRouteName: string): Route[] => {
+    const newRoutes = routes.map(value => {
+        if (value.id !== routeId) return value
+        const newRoute = { ...value }
+        newRoute.routeName = newRouteName
+        return newRoute
+    })
+    return newRoutes
 }
 
 /**

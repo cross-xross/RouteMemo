@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { Text, View, Button, StyleSheet, FlatList } from 'react-native';
+import { View, Button, StyleSheet, FlatList } from 'react-native';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { Drive } from './domains/Drive';
-import DriveList from './components/DriveList';
-import PointNameDialog, { PointNameDialogState } from './components/PointNameDialog';
-import { addNewRecord, addPointName, loadDrives } from './Reducer'
-import AppStorage from './AppStorage'
+import { Drive } from '../domains/Drive';
+import { Route } from '../domains/Route';
+import DriveList from './DriveList';
+import PointNameDialog, { PointNameDialogState } from './PointNameDialog';
+import { addNewRecord, addPointName, loadAllRoutes, saveRoute } from '../Reducer'
+import AppStorage from '../AppStorage'
 
 const appStorage = new AppStorage()
 
@@ -20,15 +21,16 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
   render() {
     return (
       <View style={styles.container}>
-        <FlatList
-          data={this.props.drives}
+        <FlatList<Drive>
+          data={this.props.currentRoute.drives}
           renderItem={value => this.renderList(value.item)}
           keyExtractor={value => `${value.id}`}
         />
         <View>
           <Button title="Record" onPress={this.handleRecordBtnClick} />
-          <Button title="Store" onPress={this.storeData} />
-          <Button title="Restore" onPress={this.getData} />
+          <Button title="Store" onPress={this.store} />
+          <Button title="Restore" onPress={this.restore} />
+          <Button title="ViewStore" onPress={this.viewStore} />
         </View>
         <PointNameDialog
           isModalVisible={this.props.isModalVisible}
@@ -50,14 +52,14 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
         departureTime={item.departureTime!}
       />
     );
-  };
+  }
 
   /**
    * Recordボタン押下時の処理
    */
   handleRecordBtnClick = () => {
     this.props.addNewRecord()
-  };
+  }
 
   /**
    * モーダルダイアログで発生したイベントハンドリング
@@ -66,7 +68,7 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
     if (value !== undefined) {
       this.props.addPointName(value.pointName)
     }
-  };
+  }
 
   // componentDidMount = () => {
   //   AppState.addEventListener('change', this.handleAppStateChange);
@@ -86,18 +88,34 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
   //   this.setState({ appState: nextAppState });
   // };
 
-  storeData = () => {
-    appStorage.saveDrivesToStorage(this.props.drives)
-  };
+  viewStore = () => {
+    console.log('allRoutes:' + JSON.stringify(this.props.allRoutes))
+    console.log('currentRoute:' + JSON.stringify(this.props.currentRoute))
+    console.log('currentRouteId:' + JSON.stringify(this.props.currentRouteId))
+  }
 
-  getData = async () => {
+  storeData = () => {
+    appStorage.saveCurrentRoute(this.props.currentRoute.drives)
+  }
+
+  store = () => {
+    const newRoutes = this.props.allRoutes.map(value => {
+      if (value.id !== this.props.currentRouteId) return value
+      return { ...this.props.currentRoute }
+    })
+    if (newRoutes.length === 0) newRoutes.push(this.props.currentRoute)
+
+    appStorage.saveAllRoutes(newRoutes, this.props.currentRouteId)
+  }
+
+  restore = async () => {
     try {
-      const drives: Drive[] = await appStorage.loadDrivesFromStorage()
-      this.props.loadDrives(drives)
+      const routesAndCurrent = await appStorage.loadAllRoutes()
+      this.props.loadAllRoutes(routesAndCurrent.allRoutes, routesAndCurrent.currentRouteId)
     } catch (error) {
       console.warn('err:' + error)
     }
-  };
+  }
 }
 
 /**
@@ -112,15 +130,17 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   // storeは巨大なJsonの塊なので、nameにjsonから取って来たデータを代入している。 
-  name: state.user.name,
-  drives: state.user.drives,
+  allRoutes: state.user.allRoutes,
+  currentRoute: state.user.currentRoute,
+  currentRouteId: state.user.currentRouteId,
   isModalVisible: state.user.isModalVisible
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   addNewRecord: () => dispatch(addNewRecord()),
   addPointName: (newPointName: string) => dispatch(addPointName(newPointName)),
-  loadDrives: (drives: Drive[]) => dispatch(loadDrives(drives))
+  loadAllRoutes: (routes: Route[], currentRouteId: number) => dispatch(loadAllRoutes(routes, currentRouteId)),
+  saveRoute: () => dispatch(saveRoute())
 })
 
 export default connect(

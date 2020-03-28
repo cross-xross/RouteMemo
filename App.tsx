@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import { store } from './Reducer'
-import RouteEntry from './RouteEntry'
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
-import RootScreen from './RootScreen';
-import RouteHistory from './RouteHistory';
+import RouteEntry from './components/RouteEntry'
+import RootScreen from './components/RootScreen';
+import RouteHistory from './components/RouteHistory';
 
 const RootStack = createStackNavigator(
   {
@@ -16,7 +16,7 @@ const RootStack = createStackNavigator(
   {
     initialRouteName: 'Root'
   }
-);
+)
 
 const AppContainer = createAppContainer(RootStack);
 
@@ -30,6 +30,6 @@ export default class Root extends React.Component {
       <Provider store={store}>
         <AppContainer />
       </Provider>
-    );
+    )
   }
 }

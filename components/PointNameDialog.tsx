@@ -33,7 +33,7 @@ export default class PointNameDialog extends React.Component<PointNameDialogProp
         this.state = {
             pointName: "",
             pointMemo: ""
-        };
+        }
     }
 
     render() {
@@ -42,20 +42,20 @@ export default class PointNameDialog extends React.Component<PointNameDialogProp
                 <View style={styles.container}>
                     <View>
                         <Text>地点名</Text>
-                        <TextInput style={styles.pointNameInput} 
-                                onChangeText={(text) => {this.handleOnChangePointNameInput(text)}}/>
+                        <TextInput style={styles.pointNameInput}
+                            onChangeText={(text) => { this.handleOnChangePointNameInput(text) }} />
                     </View>
                     <View>
                         <Text>メモ</Text>
-                        <TextInput style={styles.pointMemoInput} 
-                                multiline 
-                                onChangeText={(text) => {this.handleOnChangePointMemoInput(text)}}/>
+                        <TextInput style={styles.pointMemoInput}
+                            multiline
+                            onChangeText={(text) => { this.handleOnChangePointMemoInput(text) }} />
                     </View>
                     <View style={styles.pointNameDialogButtons}>
-                        <Button title="OK" 
-                                onPress={() => this.props.onDialogDismiss(this.state) } />
-                        <Button title="Cancel" 
-                                onPress={() => this.props.onDialogDismiss()} />
+                        <Button title="OK"
+                            onPress={() => this.props.onDialogDismiss(this.state)} />
+                        <Button title="Cancel"
+                            onPress={() => this.props.onDialogDismiss()} />
                     </View>
                 </View>
             </Modal>
@@ -66,14 +66,14 @@ export default class PointNameDialog extends React.Component<PointNameDialogProp
      * 地点名の入力イベントハンドリング
      */
     handleOnChangePointNameInput = (text) => {
-        this.setState({pointName: text});
+        this.setState({ pointName: text });
     }
 
     /**
      * 地点メモの入力イベントハンドリング
      */
     handleOnChangePointMemoInput = (text) => {
-        this.setState({pointMemo: text});
+        this.setState({ pointMemo: text });
     }
 }
 

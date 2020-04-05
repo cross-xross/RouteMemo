@@ -37,7 +37,7 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
           onDialogDismiss={this.handleDialogDismiss}
         />
       </View>
-    );
+    )
   }
 
   /**
@@ -51,7 +51,7 @@ export class RouteEntry extends React.Component<RouteEntryProps> {
         arrivalTime={item.arrivalTime!}
         departureTime={item.departureTime!}
       />
-    );
+    )
   }
 
   /**
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   }
-});
+})
 
 const mapStateToProps = state => ({
   // storeは巨大なJsonの塊なので、nameにjsonから取って来たデータを代入している。 

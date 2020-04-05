@@ -1,15 +1,20 @@
-import * as React from 'react';
-import { View, Text, Button, StyleSheet, FlatList, Alert } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import { NavigationScreenProp } from 'react-navigation';
-import { Dispatch } from 'redux';
-import { connect } from 'react-redux';
-import { Route } from '../domains/Route';
-import RouteHistoryListMenu from './RouteHistoryListMenu';
-import { createRoute, renameRoute, loadRoute, saveRoute } from '../Reducer'
+import * as React from 'react'
+import { View, Text, Button, StyleSheet, FlatList, Alert } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import { NavigationScreenProp } from 'react-navigation'
+import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
+import Dialog from "react-native-dialog"
+import { Route } from '../domains/Route'
+import RouteHistoryListMenu from './RouteHistoryListMenu'
+import {
+  createRoute, renameRoute, loadRoute, saveRoute, setRouteHistoryPopupMenuVisible,
+  deleteRoute, setRouteNameEntryDialogVisible
+} from '../Reducer'
 
 export class RouteHistory extends React.Component<RouteHistoryProps> {
-  isPopupMenuVisible = false
+  currentRouteName = ''
+  selectedRouteId = -1
 
   render() {
     return (
@@ -24,10 +29,20 @@ export class RouteHistory extends React.Component<RouteHistoryProps> {
           <Button title="NewRoute" onPress={this.props.createRoute} />
         </View>
         <RouteHistoryListMenu
-          menuTitles={["rename", "delete", "export"]}
-          isModalVisible={this.isPopupMenuVisible}
-          onDialogDismiss={this.handleDialogDismiss}
+          menuItems={[
+            {
+              menuTitle: 'rename',
+              onMenuPress: () => { this.beginRenameRoute() }
+            }
+          ]}
+          isModalVisible={this.props.isRouteHistoryPopupMenuVisible}
         />
+        <Dialog.Container visible={this.props.isRouteNameEntryDialogVisible}>
+          <Dialog.Title>ルート名変更</Dialog.Title>
+          <Dialog.Input label="変更後のルート名称を入力してください。" onChangeText={(routeName) => { this.currentRouteName = routeName }} />
+          <Dialog.Button label="Cancel" onPress={() => { this.props.setRouteNameEntryDialogVisible(false) }} />
+          <Dialog.Button label="OK" onPress={this.renameRoute} />
+        </Dialog.Container>
       </View>
     )
   }
@@ -56,23 +71,24 @@ export class RouteHistory extends React.Component<RouteHistoryProps> {
    * ルート名ロングタップ時の処理
    */
   handleRouteLongTop = (item: Route) => {
-    //ポップアップを表示
-    this.isPopupMenuVisible = true
+    this.selectedRouteId = item.id
+    this.props.setRouteHistoryPopupMenuVisible(true)
   }
 
   /**
-   * モーダルダイアログで発生したイベントハンドリング
+   * ルート名入力ダイアログ表示
    */
-  handleDialogDismiss = () => {
-    this.isPopupMenuVisible = false
-    alert('dismiss')
+  beginRenameRoute = () => {
+    this.props.setRouteHistoryPopupMenuVisible(false)
+    this.props.setRouteNameEntryDialogVisible(true)
   }
 
   /**
-   * Renameボタン押下時の処理
+   * ルート名変更
    */
   renameRoute = () => {
-    this.props.renameRoute(this.props.currentRouteId, 'ルート名変更しました')
+    this.props.renameRoute(this.selectedRouteId, this.currentRouteName)
+    this.props.setRouteNameEntryDialogVisible(false)
   }
 }
 
@@ -85,14 +101,19 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   allRoutes: state.user.allRoutes,
   currentRoute: state.user.currentRoute,
-  currentRouteId: state.user.currentRouteId
+  currentRouteId: state.user.currentRouteId,
+  isRouteHistoryPopupMenuVisible: state.user.isRouteHistoryPopupMenuVisible,
+  isRouteNameEntryDialogVisible: state.user.isRouteNameEntryDialogVisible
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   renameRoute: (routeId: number, newRouteName: string) => dispatch(renameRoute(routeId, newRouteName)),
   createRoute: () => dispatch(createRoute()),
   loadRoute: (route: Route) => dispatch(loadRoute(route)),
-  saveRoute: () => dispatch(saveRoute())
+  saveRoute: () => dispatch(saveRoute()),
+  setRouteHistoryPopupMenuVisible: (visible: boolean) => dispatch(setRouteHistoryPopupMenuVisible(visible)),
+  deleteRoute: () => dispatch(deleteRoute()),
+  setRouteNameEntryDialogVisible: (visible: boolean) => dispatch(setRouteNameEntryDialogVisible(visible))
 })
 
 export default connect(

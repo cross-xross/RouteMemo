@@ -1,22 +1,26 @@
 import * as React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import Modal from "react-native-modal";
+
+export interface ListMenuItem {
+  menuTitle: string
+  onMenuPress: () => void
+}
 
 /**
  * プロパティ定義
  */
 export interface RouteHistoryListMenuProps {
-  onDialogDismiss: () => void;
-  menuTitles: string[];
-  isModalVisible: boolean;
+  menuItems: ListMenuItem[]
+  isModalVisible: boolean
 }
 
 /**
  * State定義
  */
 export interface RouteHistoryListMenuState {
-  menuTitles: string[];
+  menuItems: ListMenuItem[]
 }
 
 /**
@@ -29,9 +33,9 @@ export default class RouteHistoryListMenu extends React.Component<RouteHistoryLi
    * @param props 
    */
   constructor(props: RouteHistoryListMenuProps) {
-    super(props);
+    super(props)
     this.state = {
-      menuTitles: props.menuTitles
+      menuItems: props.menuItems
     }
   }
 
@@ -39,25 +43,16 @@ export default class RouteHistoryListMenu extends React.Component<RouteHistoryLi
     return (
       <Modal isVisible={this.props.isModalVisible}>
         <FlatList
-          data={this.props.menuTitles}
+          data={this.props.menuItems}
           renderItem={value => this.renderList(value.item)}
           keyExtractor={(value, index) => index.toString()} />
       </Modal>
     )
   }
 
-  renderList = (item) => {
+  renderList = (item: ListMenuItem) => {
     return (
-      <ListItem title={item} onPress={() => { this.props.onDialogDismiss() }} />
+      <ListItem title={item.menuTitle} onPress={() => { item.onMenuPress() }} />
     )
   }
 }
-
-/**
- * Define view styles.
- */
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff"
-  },
-})

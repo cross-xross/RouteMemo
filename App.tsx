@@ -1,11 +1,11 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { store } from './Reducer'
-import { createStackNavigator } from 'react-navigation-stack';
-import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack'
+import { createAppContainer } from 'react-navigation'
 import RouteEntry from './components/RouteEntry'
-import RootScreen from './components/RootScreen';
-import RouteHistory from './components/RouteHistory';
+import RootScreen from './components/RootScreen'
+import RouteHistory from './components/RouteHistory'
 
 const RootStack = createStackNavigator(
   {

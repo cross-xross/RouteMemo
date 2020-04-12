@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View, Text, Button, StyleSheet, FlatList } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
+import { RouteReducerInterface } from '../reducers/RouteReducer'
 import { ListItem } from 'react-native-elements'
 import Dialog from "react-native-dialog"
 import { Route } from '../domains/Route'
@@ -10,14 +11,14 @@ import {
 } from '../actions/RouteActions'
 import { NavigationScreenProp } from 'react-navigation'
 
-interface SampleProps {
+interface RouteHistoryProps {
   navigation: NavigationScreenProp<any, any>,
 }
 
 /**
  * ApplicationComponent
  */
-export default (props: SampleProps) => {
+export default (props: RouteHistoryProps) => {
   return (
     <View style={styles.container}>
       <RouteHistoryArea navigation={props.navigation} />
@@ -33,9 +34,9 @@ let selectedRouteId = -1
 /**
  * ルート表示領域
  */
-const RouteHistoryArea = (props: SampleProps) => {
+const RouteHistoryArea = (props: RouteHistoryProps) => {
 
-  const allRoutes = useSelector(state => state.user.allRoutes)
+  const allRoutes = useSelector((state: RouteReducerInterface) => state.allRoutes)
   const dispatch = useDispatch()
 
   return (
@@ -103,7 +104,7 @@ const ButtonArea = () => {
 const ModalArea = () => {
   let currentRouteName = ''
 
-  const isRouteNameEntryDialogVisible = useSelector(state => state.user.isRouteNameEntryDialogVisible)
+  const isRouteNameEntryDialogVisible = useSelector((state: RouteReducerInterface) => state.isRouteNameEntryDialogVisible)
   const dispatch = useDispatch()
 
   return (
@@ -128,7 +129,7 @@ const ModalArea = () => {
  * メニュー表示領域
  */
 const MenuArea = () => {
-  const isRouteHistoryPopupMenuVisible = useSelector(state => state.user.isRouteHistoryPopupMenuVisible)
+  const isRouteHistoryPopupMenuVisible = useSelector((state: RouteReducerInterface) => state.isRouteHistoryPopupMenuVisible)
   const dispatch = useDispatch()
 
   return (

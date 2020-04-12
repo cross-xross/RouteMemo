@@ -1,8 +1,6 @@
 import { createAction } from '@reduxjs/toolkit'
 import { Route } from '../domains/Route';
 
-// actions.js
-// actionはreduxの機能でなく、オブジェクトを作るための純粋なjsの関数です。
 export const addNewRecord = createAction<string>('ADD_NEW_RECORD')
 
 export const addPointName = createAction('ADD_POINT_NAME', (newPointName: string) => ({

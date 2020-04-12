@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { View, Button, StyleSheet, FlatList } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
+import { RouteReducerInterface } from '../reducers/RouteReducer'
 import { Drive } from '../domains/Drive'
 import DriveList from '../components/DriveList'
 import PointNameDialog, { PointNameDialogState } from '../components/PointNameDialog'
@@ -25,7 +26,7 @@ export default () => {
  */
 const RouteArea = () => {
 
-  const currentRoute = useSelector(state => state.user.currentRoute)
+  const currentRoute = useSelector((state: RouteReducerInterface) => state.currentRoute)
 
   return (
     <FlatList<Drive>
@@ -56,9 +57,9 @@ const RouteArea = () => {
 const ButtonArea = () => {
 
   const appStorage = new AppStorage()
-  const allRoutes = useSelector(state => state.user.allRoutes)
-  const currentRoute = useSelector(state => state.user.currentRoute)
-  const currentRouteId = useSelector(state => state.user.currentRouteId)
+  const allRoutes = useSelector((state: RouteReducerInterface) => state.allRoutes)
+  const currentRoute = useSelector((state: RouteReducerInterface) => state.currentRoute)
+  const currentRouteId = useSelector((state: RouteReducerInterface) => state.currentRouteId)
   const dispatch = useDispatch()
 
   return (
@@ -116,7 +117,7 @@ const ButtonArea = () => {
  */
 const ModalArea = () => {
 
-  const isModalVisible = useSelector(state => state.user.isModalVisible)
+  const isModalVisible = useSelector((state: RouteReducerInterface) => state.isModalVisible)
   const dispatch = useDispatch()
 
   return (

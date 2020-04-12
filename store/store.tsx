@@ -1,16 +1,13 @@
-import { combineReducers, createStore, applyMiddleware } from 'redux';
-import RouteReducer from '../reducers/RouteReducer';
-// import SampleReducer, { SampleReducerInterface } from '../reducers/SampleReducer';
+import { combineReducers, createStore, applyMiddleware } from 'redux'
+import RouteReducer from '../reducers/RouteReducer'
 import thunkMiddleware from 'redux-thunk'
 
 export interface AppStateInterface {
-  user: any,
-  // sample: SampleReducerInterface
+  route: any
 }
 
 const reducers = combineReducers<AppStateInterface>({
-  user: RouteReducer,
-  // sample: SampleReducer
+  route: RouteReducer.reducer
 })
 
 export default createStore(reducers, applyMiddleware(thunkMiddleware))

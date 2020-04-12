@@ -8,14 +8,19 @@ import RouteHistoryListMenu from '../components/RouteHistoryListMenu'
 import {
   createRoute, renameRoute, loadRoute, setRouteHistoryPopupMenuVisible, setRouteNameEntryDialogVisible
 } from '../actions/RouteActions'
+import { NavigationScreenProp } from 'react-navigation'
+
+interface SampleProps {
+  navigation: NavigationScreenProp<any, any>,
+}
 
 /**
  * ApplicationComponent
  */
-export default () => {
+export default (props: SampleProps) => {
   return (
     <View style={styles.container}>
-      <RouteHistoryArea />
+      <RouteHistoryArea navigation={props.navigation} />
       <ButtonArea />
       <ModalArea />
       <MenuArea />
@@ -28,7 +33,7 @@ let selectedRouteId = -1
 /**
  * ルート表示領域
  */
-const RouteHistoryArea = (props) => {
+const RouteHistoryArea = (props: SampleProps) => {
 
   const allRoutes = useSelector(state => state.user.allRoutes)
   const dispatch = useDispatch()

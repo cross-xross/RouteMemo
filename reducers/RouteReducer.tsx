@@ -1,4 +1,4 @@
-import { createReducer } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { Drive, DriveImpl, DriveCondition } from '../domains/Drive'
 import { Route, RouteImpl } from '../domains/Route';
 import { dateFormat } from '../util/dateFormat'
@@ -33,18 +33,28 @@ const initialState = (): RouteReducerInterface => {
 // reduxではglobal stateを巨大なjson(store)として管理します。stateの変更はjsonの書き換えによってのみ管理します。
 // actionは純粋なjsのオブジェクトを作る関数であることを思い出してください。
 // reducerはactionで生成されたオブジェクトを受け取り、巨大なjson(store)を書き換える関数です。
-export default createReducer(initialState, {
-  addNewRecord: (state, action) => {
-    const newDrives = addNewRecordImpl(state.currentRoute.drives)
-    const latestDrive = getLatestDrive(newDrives)
-    const newCurretRoute = {
-      ...state.currentRoute,
-      drives: newDrives
-    }
-    return {
-      ...state,
-      currentRoute: newCurretRoute,
-      isModalVisible: latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME
+export default createSlice({
+  name: 'user',
+  initialState: initialState,
+  reducers: {
+    ADD_NEW_RECORD: (state: RouteReducerInterface, action) => {
+      const newDrives = addNewRecordImpl(state.currentRoute.drives)
+      const latestDrive = getLatestDrive(newDrives)
+      const newCurretRoute = {
+        ...state.currentRoute,
+        drives: newDrives
+      }
+      state.currentRoute = newCurretRoute
+      state.isModalVisible = (latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME)
+      return {
+        ...state,
+        currentRoute: newCurretRoute,
+        isModalVisible: latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME
+      }
+    },
+    ADD_POINT_NAME: (state, action) => {
+    },
+    LOAD_ALL_ROUTES: (state, action) => {
     }
   }
 })

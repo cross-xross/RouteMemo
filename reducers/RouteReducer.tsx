@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Drive, DriveImpl, DriveCondition } from '../domains/Drive'
 import { Route, RouteImpl } from '../domains/Route';
 import { dateFormat } from '../util/dateFormat'
@@ -10,6 +10,16 @@ export interface RouteReducerInterface {
   currentRouteId: number
   isRouteHistoryPopupMenuVisible: boolean
   isRouteNameEntryDialogVisible: boolean
+}
+
+interface loadAllRoutesPayload {
+  routes: Route[]
+  currentRouteId: number
+}
+
+interface renameRoutePayload {
+  routeId: number
+  newRouteName: string
 }
 
 /**
@@ -42,12 +52,12 @@ function setUpState(): RouteReducerInterface {
   }
 }
 
-export default createSlice({
+const routeModule = createSlice({
   name: 'route',
   initialState: initialState,
   reducers: {
     // ドライブレコード追加
-    ADD_NEW_RECORD: (state: RouteReducerInterface, action) => {
+    addNewRecord: (state: RouteReducerInterface, action) => {
       const newDrives = addNewRecordImpl(state.currentRoute.drives)
       const latestDrive = getLatestDrive(newDrives)
       const newCurretRoute = {
@@ -58,10 +68,10 @@ export default createSlice({
       state.isModalVisible = (latestDrive.mode === DriveCondition.WAIT_FOR_POINT_NAME)
     },
     // 地点名追加
-    ADD_POINT_NAME: (state: RouteReducerInterface, action) => {
+    addPointName: (state: RouteReducerInterface, action: PayloadAction<string>) => {
       const newDrives = state.currentRoute.drives.map((drive, index) => {
         if (index !== state.currentRoute.drives.length - 1) return drive;
-        drive.pointName = action.payload.pointName
+        drive.pointName = action.payload
         return drive;
       })
       const newCurretRoute = {
@@ -72,7 +82,7 @@ export default createSlice({
       state.isModalVisible = false
     },
     // ルート新規生成
-    CREATE_ROUTE: (state: RouteReducerInterface, action) => {
+    createRoute: (state: RouteReducerInterface, action) => {
       // currentRouteをallRoutesに保存する
       let issaved = false
       const newRoutes = state.allRoutes.map(value => {
@@ -90,7 +100,7 @@ export default createSlice({
       state.currentRouteId = newCurrentRoute.id
     },
     // actionで渡された全ルートをstateに保存
-    LOAD_ALL_ROUTES: (state: RouteReducerInterface, action) => {
+    loadAllRoutes: (state: RouteReducerInterface, action: PayloadAction<loadAllRoutesPayload>) => {
       const newRoutes = [...action.payload.routes]
       let newCurrentRouteId = action.payload.currentRouteId
       // 現在のルートを読み込み
@@ -106,7 +116,7 @@ export default createSlice({
       state.currentRouteId = newCurrentRouteId
     },
     // Actionで渡されたルートをstateのcurrentRouteに保存
-    LOAD_ROUTE: (state: RouteReducerInterface, action) => {
+    loadRoute: (state: RouteReducerInterface, action: PayloadAction<Route>) => {
       // currentRouteをallRoutesに保存する
       const newRoutes = state.allRoutes.map(value => {
         if (value.id !== state.currentRouteId) return value
@@ -114,8 +124,8 @@ export default createSlice({
       })
 
       // Actionで渡されたRouteをcurrentRouteとcurrentRouteIdに設定する
-      if (action.payload.route.id !== state.currentRouteId) {
-        const newRoute = { ...action.payload.route }
+      if (action.payload.id !== state.currentRouteId) {
+        const newRoute = { ...action.payload }
         state.allRoutes = newRoutes
         state.currentRoute = newRoute
         state.currentRouteId = newRoute.id
@@ -124,7 +134,7 @@ export default createSlice({
       }
     },
     // currentRouteをallRoutesに保存、まだ使ってない、不要かも
-    SAVE_ROUTE: (state: RouteReducerInterface, action) => {
+    saveRoute: (state: RouteReducerInterface, action) => {
       const newRoutes = state.allRoutes.map(value => {
         if (value.id !== state.currentRouteId) return value
         return state.currentRoute
@@ -132,7 +142,7 @@ export default createSlice({
       state.allRoutes = newRoutes
     },
     // ルート名変更
-    RENAME_ROUTE: (state: RouteReducerInterface, action) => {
+    renameRoute: (state: RouteReducerInterface, action: PayloadAction<renameRoutePayload>) => {
       const newRoutes = renameRouteImpl(state.allRoutes, action.payload.routeId, action.payload.newRouteName)
       if (state.currentRouteId !== action.payload.routeId) {
         state.allRoutes = newRoutes
@@ -144,15 +154,15 @@ export default createSlice({
       }
     },
     // ルート履歴画面ポップアップメニュー表示切り替え
-    SET_ROUTE_HISTORY_POPUPMENU_VISIBLE: (state: RouteReducerInterface, action) => {
-      state.isRouteHistoryPopupMenuVisible = action.payload.visible
+    setRouteHistoryPopupmenuVisible: (state: RouteReducerInterface, action: PayloadAction<boolean>) => {
+      state.isRouteHistoryPopupMenuVisible = action.payload
     },
     // ルート名入力ダイアログ表示
-    SET_ROUTE_NAME_ENTRY_DIALOG_VISIBLE: (state: RouteReducerInterface, action) => {
-      state.isRouteNameEntryDialogVisible = action.payload.visible
+    setRouteNameEntryDialogVisible: (state: RouteReducerInterface, action: PayloadAction<boolean>) => {
+      state.isRouteNameEntryDialogVisible = action.payload
     },
     // ルート削除（未実装）
-    DELETE_ROUTE: (state: RouteReducerInterface, action) => {
+    deleteRoute: (state: RouteReducerInterface, action) => {
     }
   }
 })
@@ -225,3 +235,13 @@ const isAllAreaInputed = (drive: Drive): boolean => {
 const getLatestDrive = (drives: Drive[]): Drive => {
   return drives[drives.length - 1];
 }
+
+
+
+export const {
+  addNewRecord, addPointName, createRoute, loadAllRoutes, loadRoute, renameRoute,
+  setRouteHistoryPopupmenuVisible, setRouteNameEntryDialogVisible
+} = routeModule.actions
+
+export default routeModule
+

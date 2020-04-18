@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { View, Text, Button, StyleSheet, FlatList } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
-import { RouteReducerInterface } from '../reducers/RouteReducer'
 import { ListItem } from 'react-native-elements'
 import Dialog from "react-native-dialog"
 import { Route } from '../domains/Route'
+import { AppStateInterface } from '../store/store'
 import RouteHistoryListMenu from '../components/RouteHistoryListMenu'
 import {
-  createRoute, renameRoute, loadRoute, setRouteHistoryPopupMenuVisible, setRouteNameEntryDialogVisible
-} from '../actions/RouteActions'
+  createRoute, renameRoute, loadRoute, setRouteHistoryPopupmenuVisible, setRouteNameEntryDialogVisible
+} from '../reducers/RouteReducer'
 import { NavigationScreenProp } from 'react-navigation'
 
 interface RouteHistoryProps {
@@ -36,7 +36,7 @@ let selectedRouteId = -1
  */
 const RouteHistoryArea = (props: RouteHistoryProps) => {
 
-  const allRoutes = useSelector((state: RouteReducerInterface) => state.allRoutes)
+  const allRoutes = useSelector<AppStateInterface>(state => state.route.allRoutes)
   const dispatch = useDispatch()
 
   return (
@@ -76,7 +76,7 @@ const RouteHistoryArea = (props: RouteHistoryProps) => {
    */
   function handleRouteLongTop(item: Route) {
     selectedRouteId = item.id
-    dispatch(setRouteHistoryPopupMenuVisible(true))
+    dispatch(setRouteHistoryPopupmenuVisible(true))
   }
 }
 
@@ -104,7 +104,7 @@ const ButtonArea = () => {
 const ModalArea = () => {
   let currentRouteName = ''
 
-  const isRouteNameEntryDialogVisible = useSelector((state: RouteReducerInterface) => state.isRouteNameEntryDialogVisible)
+  const isRouteNameEntryDialogVisible = useSelector<AppStateInterface>(state => state.route.isRouteNameEntryDialogVisible)
   const dispatch = useDispatch()
 
   return (
@@ -129,7 +129,7 @@ const ModalArea = () => {
  * メニュー表示領域
  */
 const MenuArea = () => {
-  const isRouteHistoryPopupMenuVisible = useSelector((state: RouteReducerInterface) => state.isRouteHistoryPopupMenuVisible)
+  const isRouteHistoryPopupMenuVisible = useSelector<AppStateInterface>(state => state.route.isRouteHistoryPopupMenuVisible)
   const dispatch = useDispatch()
 
   return (
@@ -148,7 +148,7 @@ const MenuArea = () => {
    * ルート名入力ダイアログ表示
    */
   function beginRenameRoute() {
-    dispatch(setRouteHistoryPopupMenuVisible(false))
+    dispatch(setRouteHistoryPopupmenuVisible(false))
     dispatch(setRouteNameEntryDialogVisible(true))
   }
 }
